@@ -1,0 +1,14 @@
+
+Kafka Command for local:
+
+1) Create Topic:
+    bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic quickstart-events --bootstrap-server localhost:9092
+
+2) Describe Topic:
+    bin/kafka-topics.sh --describe --topic quickstart-events --bootstrap-server localhost:9092
+
+3) Console Producer:
+    bin/kafka-console-producer.sh --topic quickstart-events --bootstrap-server localhost:9092
+
+4) Console Consumer:
+    bin/kafka-console-consumer.sh --topic quickstart-events --from-beginning --bootstrap-server localhost:9092
