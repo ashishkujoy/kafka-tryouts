@@ -1,2 +1,2 @@
 kafka:
-  bootstrap-servers: 
+  bootstrap-servers: ${KAFKA_TYROUT_BOOTSERVERS:plaintext://localhost:9092}
