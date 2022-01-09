@@ -15,9 +15,7 @@ import java.util.*
 import javax.annotation.PostConstruct
 
 @Component
-class KafkaProducer {
-    @Value("\${kafka.bootstrap-servers}")
-    lateinit var kafkaServerAddress: String
+class KafkaProducer(private val kafkaConfig: KafkaConfig) {
 
     private lateinit var kafkaSender: KafkaSender<PartitionKey, KafkaMessage>
 
@@ -34,7 +32,7 @@ class KafkaProducer {
 
     private fun createKafkaSender(): KafkaSender<PartitionKey, KafkaMessage> {
         val props = mapOf(
-            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaServerAddress,
+            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaConfig.bootstrapServers,
             ProducerConfig.CLIENT_ID_CONFIG to UUID.randomUUID().toString(),
             ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION to 1,
             ProducerConfig.ACKS_CONFIG to "1",

@@ -34,7 +34,8 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:kafka")
     testImplementation("org.testcontainers:mongodb")
-    implementation("io.kotest:kotest-assertions-core:5.0.3")
+    testImplementation("io.kotest:kotest-assertions-core:5.0.3")
+    testImplementation("io.kotest:kotest-assertions-shared-jvm:5.0.3")
 }
 
 dependencyManagement {

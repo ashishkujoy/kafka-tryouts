@@ -12,6 +12,7 @@ import reactor.test.StepVerifier
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
 class KafkaProducerTest(@Autowired private val kafkaProducer: KafkaProducer) {
+
     @Test
     fun `should produce message to kafka topic`() {
         val senderResultMono = kafkaProducer.produce(
