@@ -1,4 +1,4 @@
-package org.learning.demo.lib.producer
+package org.learning.demo.lib.kafka.consumer
 
 import io.kotest.assertions.timing.EventuallyConfig
 import io.kotest.assertions.timing.eventually
@@ -7,6 +7,8 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import org.learning.demo.lib.kafka.KafkaMessage
+import org.learning.demo.lib.kafka.producer.KafkaProducer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.kafka.test.context.EmbeddedKafka
@@ -16,7 +18,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 @EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
 @ExperimentalTime
 class KafkaConsumerTest(

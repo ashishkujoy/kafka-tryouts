@@ -1,4 +1,4 @@
-package org.learning.demo.lib.producer
+package org.learning.demo.lib.kafka
 
 data class KafkaMessage(
     val eventId: String,

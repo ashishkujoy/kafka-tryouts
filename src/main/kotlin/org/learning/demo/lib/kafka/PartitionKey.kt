@@ -1,3 +1,3 @@
-package org.learning.demo.lib.producer
+package org.learning.demo.lib.kafka
 
 data class PartitionKey(val key: String)

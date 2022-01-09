@@ -1,4 +1,4 @@
-package org.learning.demo.lib.producer.serializer
+package org.learning.demo.lib.kafka.serializer
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinFeature

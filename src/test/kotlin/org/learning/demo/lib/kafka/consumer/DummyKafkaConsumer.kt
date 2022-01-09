@@ -1,5 +1,7 @@
-package org.learning.demo.lib.producer
+package org.learning.demo.lib.kafka.consumer
 
+import org.learning.demo.lib.kafka.KafkaConfig
+import org.learning.demo.lib.kafka.KafkaMessage
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.util.*

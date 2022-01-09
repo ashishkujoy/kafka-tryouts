@@ -1,9 +1,11 @@
-package org.learning.demo.lib.producer
+package org.learning.demo.lib.kafka.consumer
 
 import org.apache.kafka.clients.consumer.ConsumerConfig.*
-import org.learning.demo.lib.producer.serializer.KafkaMessageDeserializer
-import org.learning.demo.lib.producer.serializer.ObjectMapperCache
-import org.learning.demo.lib.producer.serializer.PartitionKeyDeserializer
+import org.learning.demo.lib.kafka.KafkaConfig
+import org.learning.demo.lib.kafka.KafkaMessage
+import org.learning.demo.lib.kafka.serializer.KafkaMessageDeserializer
+import org.learning.demo.lib.kafka.serializer.ObjectMapperCache
+import org.learning.demo.lib.kafka.serializer.PartitionKeyDeserializer
 import org.slf4j.LoggerFactory
 import reactor.core.Disposable
 import reactor.core.publisher.Mono

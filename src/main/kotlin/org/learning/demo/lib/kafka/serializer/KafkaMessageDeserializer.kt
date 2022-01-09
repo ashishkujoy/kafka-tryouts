@@ -1,7 +1,7 @@
-package org.learning.demo.lib.producer.serializer
+package org.learning.demo.lib.kafka.serializer
 
 import org.apache.kafka.common.serialization.Deserializer
-import org.learning.demo.lib.producer.KafkaMessage
+import org.learning.demo.lib.kafka.KafkaMessage
 
 class KafkaMessageDeserializer : Deserializer<KafkaMessage> {
     override fun deserialize(topic: String?, data: ByteArray?): KafkaMessage {

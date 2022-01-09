@@ -1,4 +1,4 @@
-package org.learning.demo.lib.producer
+package org.learning.demo.lib.kafka
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
