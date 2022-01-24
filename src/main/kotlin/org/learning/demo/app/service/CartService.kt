@@ -4,23 +4,27 @@ import org.learning.demo.app.domain.Cart
 import org.learning.demo.app.domain.Order
 import org.learning.demo.app.domain.Product
 import org.learning.demo.app.repository.CartRepository
+import org.learning.demo.app.view.CartView
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import java.math.BigDecimal
 
 @Service
-class CartService(private val cartRepository: CartRepository) {
+class CartService(
+    private val cartRepository: CartRepository,
+    private val orderService: OrderService
+) {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun checkout(cartId: String): Mono<Order> {
         return findCartBy(cartId)
             .flatMap { cart ->
-                val order = createOrderFrom(cart)
                 cart.markAsCheckedOut()
-                cartRepository.save(cart).map { order }
+                cartRepository.save(cart)
             }
+            .flatMap { createOrderFrom(it) }
             .doOnSuccess { logger.info("Successfully created order from cart") }
             .doOnError { logger.error("Failed to create order from cart", it) }
     }
@@ -31,11 +35,7 @@ class CartService(private val cartRepository: CartRepository) {
             .doOnError { logger.error("Failed to fetch cart for id $cartId", it) }
     }
 
-    private fun createOrderFrom(cart: Cart): Order {
-        return Order(
-            id = cart.id,
-            products = cart.products,
-            totalPrice = cart.totalProductPrice()
-        )
+    private fun createOrderFrom(cart: Cart): Mono<Order> {
+        return orderService.createOrderFrom(CartView(cart.id, cart.products.toSet()))
     }
 }

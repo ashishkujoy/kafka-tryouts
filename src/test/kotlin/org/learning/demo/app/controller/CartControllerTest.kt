@@ -1,6 +1,7 @@
 package org.learning.demo.app.controller
 
 import io.kotest.assertions.assertSoftly
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
@@ -52,7 +53,10 @@ class CartControllerTest(
 
         assertSoftly {
             order.shouldNotBeNull()
-            order shouldBe Order(id = "C001", products = products, totalPrice = BigDecimal("70"))
+            order.shouldBeEqualToIgnoringFields(
+                Order(id = "C001", products = products.toSet(), totalPrice = BigDecimal("70")),
+                Order::id,
+            )
         }
     }
 }
