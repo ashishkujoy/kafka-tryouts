@@ -13,7 +13,6 @@ import org.learning.demo.app.domain.OrderIdGenerator
 import org.learning.demo.app.domain.Product
 import org.learning.demo.app.repository.OrderPersistorAndEventPublisher
 import org.learning.demo.app.view.CartView
-import org.learning.demo.lib.kafka.producer.KafkaProducer
 import org.learning.demo.util.assertNextWith
 import reactor.core.publisher.Mono
 import java.math.BigDecimal

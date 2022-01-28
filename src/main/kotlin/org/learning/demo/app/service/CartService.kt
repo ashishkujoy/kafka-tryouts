@@ -2,13 +2,11 @@ package org.learning.demo.app.service
 
 import org.learning.demo.app.domain.Cart
 import org.learning.demo.app.domain.Order
-import org.learning.demo.app.domain.Product
 import org.learning.demo.app.repository.CartRepository
 import org.learning.demo.app.view.CartView
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.math.BigDecimal
 
 @Service
 class CartService(

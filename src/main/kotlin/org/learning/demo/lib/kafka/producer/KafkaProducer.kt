@@ -3,10 +3,10 @@ package org.learning.demo.lib.kafka.producer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.learning.demo.lib.kafka.KafkaConfig
-import org.learning.demo.lib.kafka.serializer.KafkaMessageSerializer
-import org.learning.demo.lib.kafka.serializer.PartitionKeySerializer
 import org.learning.demo.lib.kafka.KafkaMessage
 import org.learning.demo.lib.kafka.PartitionKey
+import org.learning.demo.lib.kafka.serializer.KafkaMessageSerializer
+import org.learning.demo.lib.kafka.serializer.PartitionKeySerializer
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import reactor.kafka.sender.KafkaSender

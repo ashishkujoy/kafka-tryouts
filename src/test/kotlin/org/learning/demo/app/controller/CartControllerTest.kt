@@ -3,7 +3,6 @@ package org.learning.demo.app.controller
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.learning.demo.IntegrationTest
