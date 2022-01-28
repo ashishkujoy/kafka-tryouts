@@ -11,16 +11,17 @@ import org.junit.jupiter.api.Test
 import org.learning.demo.app.domain.Order
 import org.learning.demo.app.domain.OrderIdGenerator
 import org.learning.demo.app.domain.Product
-import org.learning.demo.app.repository.OrderRepository
+import org.learning.demo.app.repository.OrderPersistorAndEventPublisher
 import org.learning.demo.app.view.CartView
+import org.learning.demo.lib.kafka.producer.KafkaProducer
 import org.learning.demo.util.assertNextWith
 import reactor.core.publisher.Mono
 import java.math.BigDecimal
 
 class OrderServiceTest {
     private val orderIdGenerator = mockk<OrderIdGenerator>()
-    private val orderRepository = mockk<OrderRepository>()
-    private val orderService = OrderService(orderRepository, orderIdGenerator)
+    private val orderPersistorAndEventPublisher = mockk<OrderPersistorAndEventPublisher>()
+    private val orderService = OrderService(orderPersistorAndEventPublisher, orderIdGenerator)
 
     @BeforeEach
     fun setUp() {
@@ -45,7 +46,7 @@ class OrderServiceTest {
         )
 
         every { orderIdGenerator.generateNewId() } returns "001"
-        every { orderRepository.save(any()) } answers { Mono.just(firstArg()) }
+        every { orderPersistorAndEventPublisher.saveAndPublishEvents(any()) } answers { Mono.just(firstArg()) }
 
         assertNextWith(orderService.createOrderFrom(cart)) { order ->
             order shouldBe Order(
@@ -69,11 +70,11 @@ class OrderServiceTest {
         )
 
         every { orderIdGenerator.generateNewId() } returns "001"
-        every { orderRepository.save(any()) } answers { Mono.just(firstArg()) }
+        every { orderPersistorAndEventPublisher.saveAndPublishEvents(any()) } answers { Mono.just(firstArg()) }
 
         assertNextWith(orderService.createOrderFrom(cart)) { order ->
             verify(exactly = 1) {
-                orderRepository.save(order)
+                orderPersistorAndEventPublisher.saveAndPublishEvents(order)
             }
         }
     }
