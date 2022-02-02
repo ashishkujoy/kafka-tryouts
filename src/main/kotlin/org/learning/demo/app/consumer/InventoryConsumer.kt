@@ -23,7 +23,7 @@ class InventoryConsumer(kafkaConfig: KafkaConfig, private val inventoryService: 
     topicsToConsume = listOf("order"),
     additionalConsumerProps = emptyMap()
 ) {
-    override fun processMessage(topicName: String, headers: Map<String, String>, message: KafkaMessage): Mono<Any?> {
+    override fun processMessage(topicName: String, headers: Map<String, String>, message: KafkaMessage, isNotProcessedVerified: Boolean): Mono<Any?> {
 
         return Mono.fromCallable { objectMapper.convertValue<OrderCreatedEvent>(message.payload) }
             .flatMap(inventoryService::processOrderCreatedEvent)

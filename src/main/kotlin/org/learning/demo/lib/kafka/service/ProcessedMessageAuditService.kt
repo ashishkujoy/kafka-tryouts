@@ -6,11 +6,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.kotlin.extra.retry.retryExponentialBackoff
+import reactor.util.retry.Retry
 import java.time.Duration
 import java.time.LocalDateTime
 
 @Service
-class ProcessedMessageService(
+class ProcessedMessageAuditService(
     private val processedMessageAuditRepository: ProcessedMessageAuditRepository,
     private val consumerMessageProcessingAuditConfig: ConsumerMessageProcessingAuditConfig
 ) {
@@ -28,10 +29,10 @@ class ProcessedMessageService(
         val audit = ProcessedMessageAudit(eventId, LocalDateTime.now(), consumerId)
 
         return processedMessageAuditRepository.save(audit)
-            .retryExponentialBackoff(
-                times = consumerMessageProcessingAuditConfig.totalNumberOfRetry,
-                first = Duration.ofMillis(consumerMessageProcessingAuditConfig.initialRetryDelayInMilliseconds),
-            )
+            .retryWhen(Retry.backoff(
+                consumerMessageProcessingAuditConfig.totalNumberOfRetry,
+                Duration.ofMillis(consumerMessageProcessingAuditConfig.initialRetryDelayInMilliseconds)
+            ))
             .doOnSuccess { log.info("Successfully saved message processed audit for eventId: $eventId") }
             .doOnError { log.error("Failed to save message processed audit for eventId: $eventId", it) }
     }

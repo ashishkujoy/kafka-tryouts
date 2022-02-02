@@ -6,7 +6,9 @@ import org.learning.demo.lib.kafka.KafkaMessage
 import org.learning.demo.lib.kafka.serializer.KafkaMessageDeserializer
 import org.learning.demo.lib.kafka.serializer.ObjectMapperCache
 import org.learning.demo.lib.kafka.serializer.PartitionKeyDeserializer
+import org.learning.demo.lib.kafka.service.ProcessedMessageAuditService
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import reactor.core.Disposable
 import reactor.core.publisher.Mono
 import reactor.kafka.receiver.KafkaReceiver
@@ -16,12 +18,15 @@ import javax.annotation.PostConstruct
 
 abstract class KafkaConsumer(
     kafkaConfig: KafkaConfig,
-    consumerConfig: ConsumerConfig,
+    private val consumerConfig: ConsumerConfig,
     private val topicsToConsume: List<String>,
-    private val additionalConsumerProps: Map<String, Any>
+    private val additionalConsumerProps: Map<String, Any>,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private lateinit var consumerSubscription: Disposable
+
+    @Autowired
+    private lateinit var processedMessageAuditService: ProcessedMessageAuditService
 
     private val commonConsumerProperties = mapOf<String, Any>(
         KEY_DESERIALIZER_CLASS_CONFIG to PartitionKeyDeserializer::class.java,
@@ -39,7 +44,12 @@ abstract class KafkaConsumer(
         return KafkaReceiver.create(receiverOptions)
     }
 
-    abstract fun processMessage(topicName: String, headers: Map<String, String>, message: KafkaMessage): Mono<Any?>
+    abstract fun processMessage(
+        topicName: String,
+        headers: Map<String, String>,
+        message: KafkaMessage,
+        isNotProcessedVerified: Boolean,
+    ): Mono<Any?>
 
     open fun errorHandler(
         receiverRecord: ReceiverRecord<String, KafkaMessage>,
@@ -54,7 +64,17 @@ abstract class KafkaConsumer(
     @PostConstruct
     fun run() {
         consumerSubscription = getKafkaReceiver().receive()
-            .flatMap { receiverRecord: ReceiverRecord<String, KafkaMessage> ->
+            .flatMap { record ->
+                processedMessageAuditService.isAlreadyProcessed(record.value().eventId).map { isProcessed ->
+                    Triple(isProcessed, true, record)
+                }.onErrorResume {
+                    Mono.just(Triple(false, false, record ))
+                }
+            }
+            .filter {
+                !it.first
+            }
+            .flatMap { (_, isNotProcessedVerified, receiverRecord) ->
                 val headers = receiverRecord.headers().associate { header ->
                     header.key() to ObjectMapperCache.objectMapper.readValue(header.value(), String::class.java)
                 }
@@ -62,6 +82,7 @@ abstract class KafkaConsumer(
                     receiverRecord.topic(),
                     headers,
                     receiverRecord.value(),
+                    isNotProcessedVerified
                 )
                     .map { receiverRecord }
                     .onErrorResume {
@@ -71,12 +92,19 @@ abstract class KafkaConsumer(
             .doOnNext {
                 logger.info("Message successfully process message from topic {}", it.topic())
             }
+            .flatMap { record ->
+                record.receiverOffset().commit().map { record }
+            }
             .flatMap {
-                it.receiverOffset().commit()
+                processedMessageAuditService.markAsProcessed(
+                    eventId = it.value().eventId,
+                    consumerId = consumerConfig.consumerId
+                ).map { true }
             }
             .doOnError { error ->
                 logger.error("Encounter error in kafka consumer", error)
             }
+            .onErrorResume { Mono.just(true) }
             .subscribe()
     }
 
