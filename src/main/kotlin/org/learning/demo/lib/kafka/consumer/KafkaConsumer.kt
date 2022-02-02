@@ -68,7 +68,7 @@ abstract class KafkaConsumer(
                 processedMessageAuditService.isAlreadyProcessed(record.value().eventId).map { isProcessed ->
                     Triple(isProcessed, true, record)
                 }.onErrorResume {
-                    Mono.just(Triple(false, false, record ))
+                    Mono.just(Triple(false, false, record))
                 }
             }
             .filter {
@@ -93,7 +93,7 @@ abstract class KafkaConsumer(
                 logger.info("Message successfully process message from topic {}", it.topic())
             }
             .flatMap { record ->
-                record.receiverOffset().commit().map { record }
+                record.receiverOffset().commit().map { record }.switchIfEmpty(Mono.just(record))
             }
             .flatMap {
                 processedMessageAuditService.markAsProcessed(
