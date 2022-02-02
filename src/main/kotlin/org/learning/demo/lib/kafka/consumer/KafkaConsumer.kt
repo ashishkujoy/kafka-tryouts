@@ -1,6 +1,7 @@
 package org.learning.demo.lib.kafka.consumer
 
 import org.apache.kafka.clients.consumer.ConsumerConfig.*
+import org.apache.kafka.common.header.Headers
 import org.learning.demo.lib.kafka.KafkaConfig
 import org.learning.demo.lib.kafka.KafkaMessage
 import org.learning.demo.lib.kafka.serializer.KafkaMessageDeserializer
@@ -51,6 +52,16 @@ abstract class KafkaConsumer(
     }
 
     /**
+     *  Function which return the unique id for this message.
+     *  By default, eventId is used as unique id, override this method in business consumer if you want some other field
+     *  or logic for determining unique id of message.
+     * */
+
+    open fun getUniqueIdFor(topicName: String, message: KafkaMessage, headers: Map<String, String>): String {
+        return message.eventId
+    }
+
+    /**
      *  A business consumer class should implement this method.
      *  If the return Mono complete with any element we commit the record offset in kafka, on error we call errorHandler
      *  function.
@@ -89,11 +100,20 @@ abstract class KafkaConsumer(
             }
     }
 
+    private fun headersAsMap(headers: Headers): Map<String, String> {
+        return headers.associate { header ->
+            header.key() to ObjectMapperCache.objectMapper.readValue(header.value(), String::class.java)
+        }
+    }
+
     @PostConstruct
     fun run() {
         consumerSubscription = getKafkaReceiver().receive()
             .flatMap { record ->
-                processedMessageAuditService.isAlreadyProcessed(record.value().eventId, consumerConfig.groupId).map { isProcessed ->
+                processedMessageAuditService.isAlreadyProcessed(
+                    getUniqueIdFor(record.topic(), record.value(), headersAsMap(record.headers())),
+                    consumerConfig.groupId
+                ).map { isProcessed ->
                     Triple(isProcessed, true, record)
                 }.onErrorResume {
                     Mono.just(Triple(false, false, record))
@@ -103,12 +123,9 @@ abstract class KafkaConsumer(
                 !it.first
             }
             .flatMap { (_, isNotProcessedVerified, receiverRecord) ->
-                val headers = receiverRecord.headers().associate { header ->
-                    header.key() to ObjectMapperCache.objectMapper.readValue(header.value(), String::class.java)
-                }
                 processMessage(
                     receiverRecord.topic(),
-                    headers,
+                    headersAsMap(receiverRecord.headers()),
                     receiverRecord.value(),
                     isNotProcessedVerified
                 )

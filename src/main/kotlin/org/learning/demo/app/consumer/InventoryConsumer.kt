@@ -29,4 +29,9 @@ class InventoryConsumer(kafkaConfig: KafkaConfig, private val inventoryService: 
             .flatMap(inventoryService::processOrderCreatedEvent)
             .map { true }
     }
+
+    override fun getUniqueIdFor(topicName: String, message: KafkaMessage, headers: Map<String, String>): String {
+        val orderId = message.payload["orderId"] as? String ?: ""
+        return orderId + message.eventName
+    }
 }
