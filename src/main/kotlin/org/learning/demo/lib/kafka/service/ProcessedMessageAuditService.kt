@@ -16,8 +16,8 @@ class ProcessedMessageAuditService(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun isAlreadyProcessed(eventId: String): Mono<Boolean> {
-        return processedMessageAuditRepository.findByEventId(eventId)
+    fun isAlreadyProcessed(eventId: String, consumerGroupId: String): Mono<Boolean> {
+        return processedMessageAuditRepository.findByEventIdAndConsumerGroupId(eventId, consumerGroupId)
             .map { true }
             .switchIfEmpty(Mono.just(false))
             .doOnSuccess { log.info("Successfully checked if event having id $eventId is already processed or not") }

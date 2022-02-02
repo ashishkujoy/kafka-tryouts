@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 @Repository
 interface ProcessedMessageAuditRepository: ReactiveCrudRepository<ProcessedMessageAudit, String> {
-    fun findByEventId(eventId: String): Mono<ProcessedMessageAudit>
+    fun findByEventIdAndConsumerGroupId(eventId: String, consumerGroupId: String): Mono<ProcessedMessageAudit>
 }
 
 @Document("processedMessageAudit")

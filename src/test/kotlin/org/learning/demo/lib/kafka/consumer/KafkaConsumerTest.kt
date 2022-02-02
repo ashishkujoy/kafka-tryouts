@@ -50,7 +50,7 @@ class KafkaConsumerTest(
             ProcessedMessageAudit(
                 eventId = "EB-000",
                 processedAt = LocalDateTime.now(),
-                consumerGroupId = "foo"
+                consumerGroupId = "kafka-tryout-consumer-group"
             )
         ).block()
 
@@ -88,7 +88,7 @@ class KafkaConsumerTest(
             ProcessedMessageAudit(
                 eventId = "EB-000",
                 processedAt = LocalDateTime.now(),
-                consumerGroupId = "foo"
+                consumerGroupId = "kafka-tryout-consumer-group"
             )
         ).block()
 

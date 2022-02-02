@@ -10,8 +10,8 @@ import java.util.*
 class DummyKafkaConsumer(
     kafkaConfig: KafkaConfig,
 ) : KafkaConsumer(kafkaConfig, ConsumerConfig(
-    groupId = UUID.randomUUID().toString(),
-    consumerId = UUID.randomUUID().toString(),
+    groupId = "kafka-tryout-consumer-group",
+    consumerId = "kafka-tryout-consumer",
     readPreference = ""
 ), listOf("integration-test", "integration-test-v2"), emptyMap()) {
     private val messages = mutableListOf<Triple<String, Map<String, String>, KafkaMessage>>()

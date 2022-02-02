@@ -26,7 +26,7 @@ class ProcessedMessageAuditServiceIntegrationTest(
     fun `should save audit for processed message`() {
         processedMessageAuditService.markAsProcessed("E-001", "Con-001").block()
 
-        assertNextWith(processedMessageAuditRepository.findByEventId("E-001")) {
+        assertNextWith(processedMessageAuditRepository.findByEventIdAndConsumerGroupId("E-001", "Con-001")) {
             it.shouldBeEqualToIgnoringFields(
                 ProcessedMessageAudit("E-001", LocalDateTime.now(), "Con-001"),
                 ProcessedMessageAudit::processedAt
@@ -38,16 +38,25 @@ class ProcessedMessageAuditServiceIntegrationTest(
     fun `should return true if message is already processed`() {
         processedMessageAuditService.markAsProcessed("E-002", "Con-001").block()
 
-        assertNextWith(processedMessageAuditService.isAlreadyProcessed("E-002")) {
+        assertNextWith(processedMessageAuditService.isAlreadyProcessed("E-002", "Con-001")) {
             it shouldBe true
         }
     }
 
     @Test
-    fun `should return false if message is not already processed`() {
+    fun `should return false if message is not already processed by any consumer`() {
         processedMessageAuditService.markAsProcessed("E-003", "Con-001").block()
 
-        assertNextWith(processedMessageAuditService.isAlreadyProcessed("E-004")) {
+        assertNextWith(processedMessageAuditService.isAlreadyProcessed("E-004", "Con-001")) {
+            it shouldBe false
+        }
+    }
+
+    @Test
+    fun `should return false if message is not already processed by given consumer `() {
+        processedMessageAuditService.markAsProcessed("E-003", "Con-001").block()
+
+        assertNextWith(processedMessageAuditService.isAlreadyProcessed("E-003", "Con-002")) {
             it shouldBe false
         }
     }

@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono
 import reactor.kafka.receiver.KafkaReceiver
 import reactor.kafka.receiver.ReceiverOptions
 import reactor.kafka.receiver.ReceiverRecord
+import java.util.*
 import javax.annotation.PostConstruct
 
 abstract class KafkaConsumer(
@@ -24,6 +25,7 @@ abstract class KafkaConsumer(
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private lateinit var consumerSubscription: Disposable
+    private val consumerId = "${consumerConfig.consumerId}_${UUID.randomUUID()}"
 
     @Autowired
     private lateinit var processedMessageAuditService: ProcessedMessageAuditService
@@ -33,7 +35,7 @@ abstract class KafkaConsumer(
         VALUE_DESERIALIZER_CLASS_CONFIG to KafkaMessageDeserializer::class.java,
         ENABLE_AUTO_COMMIT_CONFIG to false,
         BOOTSTRAP_SERVERS_CONFIG to kafkaConfig.bootstrapServers,
-        GROUP_ID_CONFIG to consumerConfig.consumerId,
+        GROUP_ID_CONFIG to consumerId,
         GROUP_INSTANCE_ID_CONFIG to consumerConfig.groupId,
     )
 
@@ -65,7 +67,7 @@ abstract class KafkaConsumer(
     fun run() {
         consumerSubscription = getKafkaReceiver().receive()
             .flatMap { record ->
-                processedMessageAuditService.isAlreadyProcessed(record.value().eventId).map { isProcessed ->
+                processedMessageAuditService.isAlreadyProcessed(record.value().eventId, consumerConfig.groupId).map { isProcessed ->
                     Triple(isProcessed, true, record)
                 }.onErrorResume {
                     Mono.just(Triple(false, false, record))
