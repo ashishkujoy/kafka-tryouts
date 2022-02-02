@@ -26,6 +26,12 @@ class KafkaProducer(private val kafkaConfig: KafkaConfig) {
         kafkaSender = createKafkaSender()
     }
 
+    /**
+     * Produces kafka message to given topic.
+     *
+     * @param topic on which message need to be produces.
+     * @param message which need to be produces.
+     * */
     fun produce(topic: String, message: KafkaMessage): Mono<SenderResult<String>> {
         val r = ProducerRecord(topic, PartitionKey(message.partitionKey), message)
         val senderRecord = SenderRecord.create(r, UUID.randomUUID().toString())

@@ -17,6 +17,10 @@ import reactor.kafka.receiver.ReceiverRecord
 import java.util.*
 import javax.annotation.PostConstruct
 
+/**
+ *  Base class which handles kafka connection and do all heave lifting of making sure filtering out duplicate/already
+ *  processed messages.
+ * */
 abstract class KafkaConsumer(
     kafkaConfig: KafkaConfig,
     private val consumerConfig: ConsumerConfig,
@@ -46,12 +50,34 @@ abstract class KafkaConsumer(
         return KafkaReceiver.create(receiverOptions)
     }
 
+    /**
+     *  A business consumer class should implement this method.
+     *  If the return Mono complete with any element we commit the record offset in kafka, on error we call errorHandler
+     *  function.
+     *
+     *  @param topicName topic from which message is received.
+     *  @param headers kafka message headers
+     *  @param message kafka message
+     *  @param isNotProcessedVerified true when it is verified that this message is not already processed by consumer,
+     *         false if for any reason we were not verified that this message is already processed or not.
+     *         when value is false business consumer should make it own decision to process this message or not.
+     *
+     *  @return a mono of any.
+     * */
     abstract fun processMessage(
         topicName: String,
         headers: Map<String, String>,
         message: KafkaMessage,
         isNotProcessedVerified: Boolean,
     ): Mono<Any?>
+
+    /**
+     * Any error occur while process message will be handled here. By default, error will be logged and offset will be
+     * committed, in case you want some other handling just override this method in your business consumer.
+     *
+     * @param receiverRecord the original record received.
+     * @param error the error which has happened during processing
+     * */
 
     open fun errorHandler(
         receiverRecord: ReceiverRecord<String, KafkaMessage>,
