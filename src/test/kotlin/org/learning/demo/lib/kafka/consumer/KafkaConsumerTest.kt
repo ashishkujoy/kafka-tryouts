@@ -3,7 +3,6 @@ package org.learning.demo.lib.kafka.consumer
 import io.kotest.assertions.timing.EventuallyConfig
 import io.kotest.assertions.timing.eventually
 import io.kotest.assertions.until.FixedInterval
-import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import kotlinx.coroutines.runBlocking
@@ -16,12 +15,8 @@ import org.learning.demo.lib.kafka.repository.ProcessedMessageAudit
 import org.learning.demo.lib.kafka.repository.ProcessedMessageAuditRepository
 import org.learning.demo.util.assertNextWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.kafka.test.context.EmbeddedKafka
-import org.springframework.test.annotation.DirtiesContext
 import java.time.LocalDateTime
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
 @IntegrationTest
@@ -55,7 +50,7 @@ class KafkaConsumerTest(
             ProcessedMessageAudit(
                 eventId = "EB-000",
                 processedAt = LocalDateTime.now(),
-                consumerId = "foo"
+                consumerGroupId = "foo"
             )
         ).block()
 
@@ -93,7 +88,7 @@ class KafkaConsumerTest(
             ProcessedMessageAudit(
                 eventId = "EB-000",
                 processedAt = LocalDateTime.now(),
-                consumerId = "foo"
+                consumerGroupId = "foo"
             )
         ).block()
 

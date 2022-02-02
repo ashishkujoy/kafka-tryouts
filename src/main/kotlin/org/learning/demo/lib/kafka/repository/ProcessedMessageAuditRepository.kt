@@ -17,5 +17,5 @@ data class ProcessedMessageAudit(
     @Id
     val eventId: String,
     val processedAt: LocalDateTime,
-    val consumerId: String
+    val consumerGroupId: String
 )

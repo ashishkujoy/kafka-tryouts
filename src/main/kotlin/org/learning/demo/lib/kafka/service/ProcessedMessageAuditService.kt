@@ -5,7 +5,6 @@ import org.learning.demo.lib.kafka.repository.ProcessedMessageAuditRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import reactor.kotlin.extra.retry.retryExponentialBackoff
 import reactor.util.retry.Retry
 import java.time.Duration
 import java.time.LocalDateTime
@@ -25,8 +24,8 @@ class ProcessedMessageAuditService(
             .doOnError { log.error("Failed to check if event having id $eventId is already processed or not", it) }
     }
 
-    fun markAsProcessed(eventId: String, consumerId: String): Mono<ProcessedMessageAudit> {
-        val audit = ProcessedMessageAudit(eventId, LocalDateTime.now(), consumerId)
+    fun markAsProcessed(eventId: String, consumerGroupId: String): Mono<ProcessedMessageAudit> {
+        val audit = ProcessedMessageAudit(eventId, LocalDateTime.now(), consumerGroupId)
 
         return processedMessageAuditRepository.save(audit)
             .retryWhen(Retry.backoff(

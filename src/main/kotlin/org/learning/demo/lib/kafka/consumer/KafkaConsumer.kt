@@ -98,7 +98,7 @@ abstract class KafkaConsumer(
             .flatMap {
                 processedMessageAuditService.markAsProcessed(
                     eventId = it.value().eventId,
-                    consumerId = consumerConfig.consumerId
+                    consumerGroupId = consumerConfig.groupId
                 ).map { true }
             }
             .doOnError { error ->
