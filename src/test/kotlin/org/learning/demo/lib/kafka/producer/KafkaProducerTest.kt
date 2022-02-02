@@ -2,16 +2,17 @@ package org.learning.demo.lib.kafka.producer
 
 import io.kotest.matchers.nulls.shouldBeNull
 import org.junit.jupiter.api.Test
+import org.learning.demo.IntegrationTest
 import org.learning.demo.lib.kafka.KafkaMessage
+import org.learning.demo.util.IntegrationConfigTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.ContextConfiguration
 import reactor.test.StepVerifier
 
-@SpringBootTest
-@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-@EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
+@IntegrationTest
 class KafkaProducerTest(@Autowired private val kafkaProducer: KafkaProducer) {
 
     @Test

@@ -1,2 +1,11 @@
 kafka:
   bootstrap-servers: ${KAFKA_TYROUT_BOOTSERVERS:plaintext://localhost:9092}
+  consumer:
+    message-process-audit-config:
+      total-number-of-retry: ${TOTAL_NUMBER_OF_RETRY_FOR_MESSAGE_PROCESS_AUDIT:3}
+      initial-retry-delay-in-milli-seconds: ${INITIAL_RETRY_DELAY_IN_MILLI_SECONDS:100}
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONDO_DB_URI}

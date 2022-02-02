@@ -31,7 +31,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
-    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.testcontainers:junit-jupiter")

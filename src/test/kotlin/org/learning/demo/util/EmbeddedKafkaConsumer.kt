@@ -5,6 +5,7 @@ import org.learning.demo.lib.kafka.KafkaMessage
 import org.learning.demo.lib.kafka.serializer.KafkaMessageDeserializer
 import org.learning.demo.lib.kafka.serializer.PartitionKeyDeserializer
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -14,17 +15,20 @@ import java.time.Duration
 
 @Component
 class EmbeddedKafkaConsumer {
-    private val brokerUrl = "plaintext://localhost:9092"
+    @Value("\${kafka.bootstrap-servers}")
+    private lateinit var brokerUrl: String
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val customProperties = mapOf<String, Any>(
-        ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to brokerUrl,
-        ConsumerConfig.CLIENT_ID_CONFIG to "test-client",
-        ConsumerConfig.GROUP_ID_CONFIG to "test-group",
-        ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
-        ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to PartitionKeyDeserializer::class.java,
-        ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaMessageDeserializer::class.java
-    )
+    private val customProperties by lazy {
+        mapOf<String, Any>(
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to brokerUrl,
+            ConsumerConfig.CLIENT_ID_CONFIG to "test-client",
+            ConsumerConfig.GROUP_ID_CONFIG to "test-group",
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to PartitionKeyDeserializer::class.java,
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaMessageDeserializer::class.java
+        )
+    }
 
     fun readNextMessage(topicName: String, eventName: String, numberOfMessageToRead: Int = 1): List<KafkaMessage> {
         val kafkaReceiver: KafkaReceiver<String, KafkaMessage> = kafkaReceiver(topicName)

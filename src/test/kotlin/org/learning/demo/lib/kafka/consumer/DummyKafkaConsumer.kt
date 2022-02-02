@@ -16,7 +16,7 @@ class DummyKafkaConsumer(
 ), listOf("integration-test", "integration-test-v2"), emptyMap()) {
     private val messages = mutableListOf<Triple<String, Map<String, String>, KafkaMessage>>()
 
-    override fun processMessage(topicName: String, headers: Map<String, String>, message: KafkaMessage): Mono<Any?> {
+    override fun processMessage(topicName: String, headers: Map<String, String>, message: KafkaMessage, isNotProcessedVerified: Boolean): Mono<Any?> {
         messages.add(Triple(topicName, headers, message))
         return Mono.just(true)
     }
