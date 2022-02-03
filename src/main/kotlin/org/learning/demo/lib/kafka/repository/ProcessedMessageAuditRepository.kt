@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 
 @Repository
-interface ProcessedMessageAuditRepository: ReactiveCrudRepository<ProcessedMessageAudit, String> {
+interface ProcessedMessageAuditRepository : ReactiveCrudRepository<ProcessedMessageAudit, String> {
     fun findByEventIdAndConsumerGroupId(eventId: String, consumerGroupId: String): Mono<ProcessedMessageAudit>
 }
 

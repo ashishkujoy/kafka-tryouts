@@ -45,11 +45,13 @@ class OrderServiceIntegrationTest(
 
                 messages shouldHaveSize 1
                 messages.first().payload shouldContainAll mapOf(
-                    "products" to listOf(mapOf(
-                        "productCode" to "P-0022",
-                        "quantity" to 3,
-                        "price" to 20.34,
-                    )),
+                    "products" to listOf(
+                        mapOf(
+                            "productCode" to "P-0022",
+                            "quantity" to 3,
+                            "price" to 20.34,
+                        )
+                    ),
                     "totalPrice" to 61.02,
                     "eventName" to "order-created"
                 )

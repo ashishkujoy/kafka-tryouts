@@ -28,10 +28,12 @@ class ProcessedMessageAuditService(
         val audit = ProcessedMessageAudit(eventId, LocalDateTime.now(), consumerGroupId)
 
         return processedMessageAuditRepository.save(audit)
-            .retryWhen(Retry.backoff(
-                consumerMessageProcessingAuditConfig.totalNumberOfRetry,
-                Duration.ofMillis(consumerMessageProcessingAuditConfig.initialRetryDelayInMilliseconds)
-            ))
+            .retryWhen(
+                Retry.backoff(
+                    consumerMessageProcessingAuditConfig.totalNumberOfRetry,
+                    Duration.ofMillis(consumerMessageProcessingAuditConfig.initialRetryDelayInMilliseconds)
+                )
+            )
             .doOnSuccess { log.info("Successfully saved message processed audit for eventId: $eventId") }
             .doOnError { log.error("Failed to save message processed audit for eventId: $eventId", it) }
     }

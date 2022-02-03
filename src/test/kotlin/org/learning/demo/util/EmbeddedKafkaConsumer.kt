@@ -41,7 +41,8 @@ class EmbeddedKafkaConsumer {
             .timeout(Duration.ofSeconds(5))
             .onErrorResume { e ->
                 log.error("Error while reading message from topic $topicName", e)
-                Mono.just(emptyList()) }
+                Mono.just(emptyList())
+            }
             .block() ?: emptyList()
 
         println("******* Received messages: $messages")

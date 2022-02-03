@@ -73,10 +73,12 @@ class InventoryConsumerTest(
         ).block()
 
         runBlocking {
-            eventually(EventuallyConfig(
-                duration = 5.toDuration(DurationUnit.SECONDS),
-                interval = FixedInterval(100.toDuration(DurationUnit.MILLISECONDS))
-            )) {
+            eventually(
+                EventuallyConfig(
+                    duration = 5.toDuration(DurationUnit.SECONDS),
+                    interval = FixedInterval(100.toDuration(DurationUnit.MILLISECONDS))
+                )
+            ) {
                 assertNextWith(productRepository.findByProductCode("P-001")) {
                     it.remainingQuantity shouldBe 8
                 }
@@ -93,11 +95,13 @@ class InventoryConsumerTest(
 
     @Test
     fun `should not process duplicate message`() {
-        processedMessageAuditRepository.save(ProcessedMessageAudit(
-            eventId = "001_order-created",
-            processedAt = LocalDateTime.now(),
-            consumerGroupId = "inventory-consumer-group"
-        )).block()
+        processedMessageAuditRepository.save(
+            ProcessedMessageAudit(
+                eventId = "001_order-created",
+                processedAt = LocalDateTime.now(),
+                consumerGroupId = "inventory-consumer-group"
+            )
+        ).block()
 
         productRepository.saveAll(
             listOf(
