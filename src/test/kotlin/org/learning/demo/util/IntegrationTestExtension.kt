@@ -1,6 +1,5 @@
 package org.learning.demo.util
 
-import org.junit.jupiter.api.extension.AfterEachCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.springframework.boot.test.util.TestPropertyValues
@@ -11,7 +10,7 @@ import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.utility.DockerImageName
 
 
-class IntegrationConfigTest : BeforeEachCallback {
+class IntegrationTestExtension : BeforeEachCallback {
     companion object {
         private val mongodbContainer = MongoDBContainer(DockerImageName.parse("mongo:4.0.10"))
         private val kafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"))
