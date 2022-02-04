@@ -119,20 +119,21 @@ abstract class KafkaConsumer(
                     Mono.just(Triple(false, false, record))
                 }
             }
-            .filter {
-                !it.first
-            }
-            .flatMap { (_, isNotProcessedVerified, receiverRecord) ->
-                processMessage(
-                    receiverRecord.topic(),
-                    headersAsMap(receiverRecord.headers()),
-                    receiverRecord.value(),
-                    isNotProcessedVerified
-                )
-                    .map { receiverRecord }
-                    .onErrorResume {
-                        errorHandler(receiverRecord, it)
-                    }
+            .flatMap { (isAlreadyProcessed, isNotProcessedVerified, receiverRecord) ->
+                if(isAlreadyProcessed) {
+                    Mono.just(receiverRecord)
+                } else {
+                    processMessage(
+                        receiverRecord.topic(),
+                        headersAsMap(receiverRecord.headers()),
+                        receiverRecord.value(),
+                        isNotProcessedVerified
+                    )
+                        .map { receiverRecord }
+                        .onErrorResume {
+                            errorHandler(receiverRecord, it)
+                        }
+                }
             }
             .doOnNext {
                 logger.info("Message successfully process message from topic {}", it.topic())
